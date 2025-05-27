@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shashank's Movie Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #141414;
+      color: #fff;
+    }
+
+    .header {
+      text-align: center;
+      padding: 30px 10px 10px;
+      font-size: 2em;
+      font-weight: bold;
+      color: #e50914;
+      border-bottom: 1px solid #333;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background-color: #1c1c1c;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card img {
+      width: 100%;
+      height: 270px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-content {
+      padding: 15px;
+    }
+
+    .card-title {
+      font-size: 1.1em;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .card-meta {
+      font-size: 0.9em;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+
+    .watch-btn {
+      display: inline-block;
+      padding: 8px 12px;
+      background-color: #e50914;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .watch-btn:hover {
+      background-color: #f40612;
+    }
+
+    @media screen and (max-width: 600px) {
+      .gallery {
+        padding: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">🎬 Shashank's Movie Gallery</div>
+  <div class="gallery" id="gallery"></div>
+
+  <script>
+    function fetchMovies(url) {
+      return fetch(url)
+        .then(response => response.json())
+        .catch(error => {
+          console.error('Error:', error);
+          return [];
+        });
+    }
+
+    function createCard(movie) {
+      const card = document.createElement('div');
+      card.classList.add('card');
+
+      card.innerHTML = `
+        <img src="${movie.image_url || 'https://via.placeholder.com/300x450?text=No+Image'}" alt="${movie.title}">
+        <div class="card-content">
+          <div class="card-title">${movie.title}</div>
+          <div class="card-meta">${movie.genre} | ${movie.release_year}</div>
+          <a class="watch-btn" href="watch.html?id=${movie.id}">Watch</a>
+        </div>
+      `;
+      return card;
+    }
+
+    function renderGallery(movies, container) {
+      container.innerHTML = '';
+      if (movies.length === 0) {
+        container.innerHTML = '<p style="color: #aaa;">No movies found.</p>';
+        return;
+      }
+      movies.forEach(movie => {
+        container.appendChild(createCard(movie));
+      });
+    }
+
+    const galleryDiv = document.getElementById('gallery');
+    fetchMovies(`http://${API_URL}:3000/movies`)
+      .then(movies => renderGallery(movies, galleryDiv))
+      .catch(() => {
+        galleryDiv.innerHTML = '<p style="color: #aaa;">Error loading gallery.</p>';
+      });
+  </script>
+</body>
+</html>
